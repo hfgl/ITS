@@ -3,6 +3,7 @@ import java.io.IOException;
 import Aufgabe1.LCG;
 import Aufgabe2.HC1;
 import Aufgabe3.TripleDES;
+import Aufgabe3.TripleDES_CFB;
 
 public class Main 
 {
@@ -20,12 +21,25 @@ public class Main
 			//Aufgabe2
 			HC1.CipherLCG("src/testLCG.txt", 65489432);
 			HC1.CipherSecureRandom("src/testRandom.txt", 65489432);
-			
+
 			//Aufgabe3
-//			TripleDES des = new TripleDES();
-//			des.Cipher("3DESTest.enc", "3DESTest.key", "3DESTest.out", "decrypt");
-		} 
-		catch (IOException e) 
+			TripleDES_CFB tripleDES_cfb = new TripleDES_CFB();
+			tripleDES_cfb.Cipher(
+				System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestIn",
+				System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.key",
+				System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestOut",
+				"encrypt"
+			);
+
+			tripleDES_cfb.Cipher(
+				System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestOut",
+				System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.key",
+				System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestIn",
+				"decrypt"
+			);
+
+		}
+		catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
