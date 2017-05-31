@@ -3,7 +3,7 @@ import java.io.IOException;
 import Aufgabe1.LCG;
 import Aufgabe2.HC1;
 import Aufgabe3.TripleDES;
-import Aufgabe3.TripleDES_CFB;
+import Aufgabe3.TripleDES_CFB_Copy;
 
 public class Main 
 {
@@ -23,18 +23,11 @@ public class Main
 			HC1.CipherSecureRandom("src/testRandom.txt", 65489432);
 
 			//Aufgabe3
-			TripleDES_CFB tripleDES_cfb = new TripleDES_CFB();
+			TripleDES_CFB_Copy tripleDES_cfb = new TripleDES_CFB_Copy();
 			tripleDES_cfb.Cipher(
-				System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestIn",
+				System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.enc",
 				System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.key",
-				System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestOut",
-				"encrypt"
-			);
-
-			tripleDES_cfb.Cipher(
-				System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestOut",
-				System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.key",
-				System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestIn",
+				System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.out",
 				"decrypt"
 			);
 
