@@ -29,18 +29,16 @@ public class Client extends Object {
 		long nonce = generateNonce();
 		TicketResponse ticketResponse = myKDC.requestTGSTicket(userName,"myTGS",nonce);
 		if(ticketResponse != null && ticketResponse.isEncrypted()) {
-			//Nonce check?
-			if(ticketResponse.getNonce() == nonce){
-				System.out.println("Nonce is ok");
-			}
-			//ticketResponse should be encrypted with key of client
+			//ticketResponse should be encrypted with K(C)
 			if(ticketResponse.decrypt(generateSimpleKeyFromPassword(password))) {
-				//Verschlüsselt mit K(S)
-				tgsTicket = ticketResponse.getResponseTicket();
-				//K(C,TGS)
-				tgsSessionKey = tgsTicket.getSessionKey();
-				currentUser = tgsTicket.getClientName();
-				return true;
+				//Nonce check?
+				if(ticketResponse.getNonce() == nonce){
+					tgsTicket = ticketResponse.getResponseTicket();
+					//K(C,TGS)
+					tgsSessionKey = ticketResponse.getSessionKey();
+					currentUser = userName;
+					return true;
+				}
 			}
 		}
 		return false;
@@ -57,14 +55,20 @@ public class Client extends Object {
 		Auth auth = new Auth(currentUser, currentTime);
 		//Übergabe von K(C,TGS) via auth
 		auth.encrypt(tgsSessionKey);
+		System.out.println("Client: Requesting serverticket");
 		TicketResponse response = myKDC.requestServerTicket(tgsTicket, auth, fileServer.getName(), generateNonce());
-
-		if(response.getResponseTicket().decrypt(tgsSessionKey)){
-			//Anforderung eines Dienstes von Server S mit Serverticket + K(C,S)
-			auth = new Auth(currentUser, response.getResponseTicket().getStartTime());
-			auth.encrypt(response.getSessionKey());
-			fileServer.requestService(response.getResponseTicket(), auth, "showFile", filePath);
-			return true;
+		if(!(response == null)) {
+			if (response.decrypt(tgsSessionKey)) {
+				System.out.println("#Client: KDC response decrypted with K(C,TGS): " + tgsSessionKey);
+				System.out.println("Client: Requesting service from fileserver");
+				//Anforderung eines Dienstes von Server S mit Serverticket + K(C,S)
+				auth = new Auth(currentUser, currentTime);
+				auth.encrypt(response.getSessionKey());
+				System.out.println("#Client: Authentication for Server encrypted with K(C,S): " + response.getSessionKey());
+				fileServer.requestService(response.getResponseTicket(), auth, "showFile", filePath);
+				System.out.println("___________________________________________");
+				return true;
+			}
 		}
 		return false;
 	}

@@ -106,24 +106,31 @@ public class KDC extends Object {
 		 */
 		TicketResponse response = null;
 		Ticket ticket = null;
-		if(serverName.equals(tgsName) && timeFresh(tgsAuth.getCurrentTime()) && timeValid(tgsTicket.getStartTime(),tgsTicket.getEndTime()) && tgsTicket.isEncrypted()) {
-			long tgsSessionKey = tgsTicket.getSessionKey(); // K(C,TGS)
-			///Serverticket erstellen
-			long currentTime = (new Date()).getTime();
-			//K(C,S)
-			long serverClientSessionKey = generateSimpleKey();
-			//K(S)
-			long serverTicketKey = getServerKey(serverName);
-			//Ticket mit K(C,S)
-			tgsTicket = new Ticket(user, tgsName, currentTime, currentTime + tenHoursInMillis, serverClientSessionKey);
-			//.. verschlüsselt mit K(S)
-			tgsTicket.encrypt(serverTicketKey);
+		if(serverName.equals(serverName)) {
+			System.out.println("Creating serverticket");
+			if(tgsTicket.decrypt(tgsKey)) {
+				long tgsSessionKey = tgsTicket.getSessionKey(); // K(C,TGS)
+				///Serverticket erstellen
+				long currentTime = (new Date()).getTime();
+				//K(C,S)
+				long serverClientSessionKey = generateSimpleKey();
+				//K(S)
+				long serverTicketKey = getServerKey(serverName);
+				//Ticket mit K(C,S)
+				if(tgsAuth.decrypt(tgsTicket.getSessionKey())) {
+					System.out.println("Creating internal ticket for serverticket");
+					String authUser = tgsAuth.getClientName();
+					tgsTicket = new Ticket(authUser, tgsName, currentTime, currentTime + tenHoursInMillis, serverClientSessionKey);
+					//.. verschlüsselt mit K(S)
+					tgsTicket.encrypt(serverTicketKey);
+				}
 
-			//Response mit Sessionkey K(C,S)
-			response = new TicketResponse(serverClientSessionKey, nonce, tgsTicket);
-			//.. verschlüsselt mit K(C,TGS)
-			response.encrypt(tgsSessionKey);
-			System.out.println("Created requested serverticket");
+				//Response mit Sessionkey K(C,S)
+				response = new TicketResponse(serverClientSessionKey, nonce, tgsTicket);
+				//.. verschlüsselt mit K(C,TGS)
+				response.encrypt(tgsSessionKey);
+				System.out.println("Created requested serverticket");
+			}
 		}
 		return response;
 	}
