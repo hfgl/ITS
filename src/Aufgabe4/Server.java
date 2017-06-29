@@ -42,11 +42,16 @@ public class Server extends Object {
 				System.out.println("#Server: TimeValid check successfull, from " + srvTicket.getStartTime() + " to " + srvTicket.getEndTime());
 				if (srvAuth.decrypt(srvTicket.getSessionKey()) && timeFresh(srvAuth.getCurrentTime())) {
 					System.out.println("#Server: Authentication decrypted with K(C,S): " + srvTicket.getSessionKey());
-					if (command == "showFile") {
-						System.out.println("Server: Output of given file on the server");
-						System.out.println("___________________________________________");
-						return showFile(parameter);
+					if(srvTicket.getServerName().equals(myName)) {
+						if(srvTicket.getClientName().equals(srvAuth.getClientName())) {
+							if (command == "showFile") {
+								System.out.println("Server: Output of given file on the server");
+								System.out.println("___________________________________________");
+								return showFile(parameter);
+							}
+						}
 					}
+
 				}
 			}
 		}

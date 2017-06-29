@@ -56,18 +56,21 @@ public class Client extends Object {
 		//Übergabe von K(C,TGS) via auth
 		auth.encrypt(tgsSessionKey);
 		System.out.println("Client: Requesting serverticket");
-		TicketResponse response = myKDC.requestServerTicket(tgsTicket, auth, fileServer.getName(), generateNonce());
+		long nonce = generateNonce();
+		TicketResponse response = myKDC.requestServerTicket(tgsTicket, auth, fileServer.getName(), nonce);
 		if(!(response == null)) {
 			if (response.decrypt(tgsSessionKey)) {
-				System.out.println("#Client: KDC response decrypted with K(C,TGS): " + tgsSessionKey);
-				System.out.println("Client: Requesting service from fileserver");
-				//Anforderung eines Dienstes von Server S mit Serverticket + K(C,S)
-				auth = new Auth(currentUser, currentTime);
-				auth.encrypt(response.getSessionKey());
-				System.out.println("#Client: Authentication for Server encrypted with K(C,S): " + response.getSessionKey());
-				fileServer.requestService(response.getResponseTicket(), auth, "showFile", filePath);
-				System.out.println("___________________________________________");
-				return true;
+				if( nonce == response.getNonce() ) {
+					System.out.println("#Client: KDC response decrypted with K(C,TGS): " + tgsSessionKey);
+					System.out.println("Client: Requesting service from fileserver");
+					//Anforderung eines Dienstes von Server S mit Serverticket + K(C,S)
+					auth = new Auth(currentUser, currentTime);
+					auth.encrypt(response.getSessionKey());
+					System.out.println("#Client: Authentication for Server encrypted with K(C,S): " + response.getSessionKey());
+					fileServer.requestService(response.getResponseTicket(), auth, "showFile", filePath);
+					System.out.println("___________________________________________");
+					return true;
+				}
 			}
 		}
 		return false;

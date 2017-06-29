@@ -24,15 +24,17 @@ public class Main
 
 
 			//Aufgabe3
+			/*
 			TripleDES_CFB tripleDES_cfb = new TripleDES_CFB();
 			tripleDES_cfb.Cipher(
-					System.getProperty("user.dir") + "\\src\\Aufgabe3\\ITSAufgabe3.pdf",
-					System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.key",
 					System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.enc",
+					System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.key",
+					System.getProperty("user.dir") + "\\src\\Aufgabe3\\TestFile",
 					"encrypt"
 			);
+			*/
 
-			tripleDES_cfb = new TripleDES_CFB();
+			TripleDES_CFB tripleDES_cfb = new TripleDES_CFB();
 			tripleDES_cfb.Cipher(
 				System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.enc",
 				System.getProperty("user.dir") + "\\src\\Aufgabe3\\3DESTest.key",
